@@ -7,15 +7,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import company.example.recycleviewexample.database.DbHandler;
+import company.example.recycleviewexample.models.Adreess;
+import company.example.recycleviewexample.models.Contact;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private LinearLayoutManager mLayoutManager;
-    private List<Contact> people = new ArrayList<>();
+    private List<String> contactos = new ArrayList<>();
+    private TextView dateCurr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +35,39 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //TODO look for database
+        DbHandler db = new DbHandler(this);
+
+        db.onUpgrade(db.getWritableDatabase(), 1, 1);
+        /**
+         * CRUD Operations
+         * */
+        // Inserting Contacts
+        Log.d("Insert: ", "Inserting ..");
+        //int id, String name, int phoneNumber,String street , int number, String state
+        db.addContact(new Contact(1, "Ravi", 910000000));
+        db.addContact(new Contact(2,"Srinivas",919999999));
+        db.addContact(new Contact(3,"Tommy", 952222222 ));
+        db.addContact(new Contact(4, "Karthik", 953333333));
+        //adding adreess
+        db.addAdress(new Adreess(1, "Miguel Hidalgo", "85", "GA", 1));
+        db.addAdress(new Adreess(2, "Miguel Hidalgo 1", "86", "GA", 2));
+        db.addAdress(new Adreess(3, "Miguel Hidalgo 2", "87", "GA", 3));
+        db.addAdress(new Adreess(4, "Miguel Hidalgo 3", "88", "GA", 4));
+
+        // Reading all contacts
+        Log.d("Reading: ", "Reading all contacts..");
+        List<Contact> contacts = db.getAllContacts();
+        int i =0;
+        for (Contact cn : contacts) {
+            String log = "Id: " + cn.getId() + " ,Name: " + cn.getName() + " ,Phone: " + cn.getPhoneNumber();
+            contactos.add("Name: " + log);
+            i++;
+            // Writing Contacts to log
+            Log.d("Name: ", log);
+        }
+
         // getting the RecycleView
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
 
@@ -39,13 +76,18 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
         //using the layout manager
         mLayoutManager = new LinearLayoutManager(this);
-        mLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        people.add(new Contact("mike","chavez"));
-        people.add(new Contact("Jorge","Barrientos"));
         //adapter
-        mAdapter = new MyAdapter(people);
+        mAdapter = new MyAdapter(contacts);
+
+        String example="This a comment";
+        Log.d("TAG", example);
+
         mRecyclerView.setAdapter(mAdapter);
+
+
+
 
 
 
